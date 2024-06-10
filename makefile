@@ -1,28 +1,25 @@
-# Змінні для ім'я образу та його тега
-IMAGE_NAME := my-makefile
-IMAGE_TAG := v1.0
+# Makefile для збірки коду на різних платформах та архітектурах
 
-# Призначення для збирання коду для Linux
+BINARY_NAME=myapp
+VERSION=1.0
+IMAGE_TAG=$(BINARY_NAME):$(VERSION)
+
+.PHONY: all linux arm macos windows clean
+
+all: linux arm macos windows
+
 linux:
-    GOOS=linux GOARCH=amd64 go build -o $(my-makefile)
+	GOOS=linux GOARCH=amd64 go build -o $(BINARY_NAME)-linux main.go
 
-# Призначення для збирання коду для ARM
 arm:
-    GOOS=linux GOARCH=arm go build -o $(my-makefile)
+	GOOS=linux GOARCH=arm64 go build -o $(BINARY_NAME)-arm main.go
 
-# Призначення для збирання коду для macOS
 macos:
-    GOOS=darwin GOARCH=amd64 go build -o $(my-makefile)
+	GOOS=darwin GOARCH=amd64 go build -o $(BINARY_NAME)-macos main.go
 
-# Призначення для збирання коду для Windows
 windows:
-    GOOS=windows GOARCH=amd64 go build -o $(my-makefile).exe
+	GOOS=windows GOARCH=amd64 go build -o $(BINARY_NAME).exe main.go
 
-# Призначення для видалення новоствореного образу
 clean:
-    docker rmi $(my-makefile):$(IMAGE_TAG)
-
-build:
-    docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
-
-
+	rm -f $(BINARY_NAME)-linux $(BINARY_NAME)-arm $(BINARY_NAME)-macos $(BINARY_NAME).exe
+	docker rmi $(IMAGE_TAG)

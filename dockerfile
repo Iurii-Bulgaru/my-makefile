@@ -1,11 +1,25 @@
+# Dockerfile для запуску тестового набору на різних платформах та архітектурах
 
-# Dockerfile for testing code on different platforms
+FROM --platform=$BUILDPLATFORM golang:1.20 as builder
 
-FROM quay.io/projectquay/golang:1.20
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /app
+
 COPY . .
 
-RUN go build -o myapp
- 
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o myapp main.go
+
+FROM --platform=$TARGETPLATFORM scratch
+
+WORKDIR /root/
+
+COPY --from=builder /app/myapp .
+
 CMD ["./myapp"]
+
+
+
+
+
